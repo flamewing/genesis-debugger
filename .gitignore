@@ -1,0 +1,8 @@
+*~
+*.7z
+blob/*.bin
+blob.bin
+blob.h
+blob.lst
+blob.p
+
