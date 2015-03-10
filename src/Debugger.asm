@@ -25,6 +25,18 @@ Revision = 1
   if EnableDebugger
 	include "Disassembler.asm"
 ; ===========================================================================
+; Convenience macros, for increased maintainability of the code.
+    ifndef intMacros_defined
+intMacros_defined := 1
+enableInts macro
+	move	#$2300,sr
+    endm
+
+disableInts macro
+	move	#$2700,sr
+    endm
+    endif
+; ===========================================================================
 ; Make sure this points to the correct location.
 ;----------------------------------------------------------------------------
 ; Enigma compressed mappings
@@ -80,7 +92,7 @@ IRMessage:				vtstring GREEN,"ir:"
 ; as parameter, calls the common initialization code and sets (if needed) the
 ; instruction maks for finding the instruction.
 InitErrorHandler macro framesz,errmsg,rewindflag,rewindfun
-	move.w	#$2700,sr					; Disable interrupts
+	disableInts							; Disable interrupts
 	pea	framesz(sp)						; Save SP before exception
 	movem.l	d0-a6,-(sp)					; Save all other registers; we will need them
 	lea	errmsg(pc),a1
@@ -490,7 +502,7 @@ NoStackTrace:
 
 	; SP is now back to the same point it was at the start of the exception.
 
-	move.w	#$2300,sr					; Enable interrupts
+	enableInts							; Enable interrupts
 
 	; Exception loop.
 .error_trap:
