@@ -1,5 +1,15 @@
 #!/bin/bash
 
+BLACK=`echo -en '\e[2;30m'`
+RED=`echo -en '\e[2;31m'`
+GREEN=`echo -en '\e[2;32m'`
+YELLOW=`echo -en '\e[2;33m'`
+BLUE=`echo -en '\e[2;34m'`
+MAGENTA=`echo -en '\e[2;35m'`
+CYAN=`echo -en '\e[2;36m'`
+WHITE=`echo -en '\e[2;37m'`
+DEFAULT=`echo -en '\e[0;39m'`
+
 # Some cleanup
 rm -rf blob/*.bin *.7z *.bin *.h *.lst *.p
 
@@ -7,15 +17,6 @@ rm -rf blob/*.bin *.7z *.bin *.h *.lst *.p
 asl -xx -c -E -q -L -r 2 -A -U -i src blob.asm
 
 if [[ -f blob.log ]]; then
-	BLACK=`echo -en '\e[30m'`
-	RED=`echo -en '\e[31m'`
-	GREEN=`echo -en '\e[32m'`
-	YELLOW=`echo -en '\e[33m'`
-	BLUE=`echo -en '\e[34m'`
-	MAGENTA=`echo -en '\e[35m'`
-	CYAN=`echo -en '\e[36m'`
-	WHITE=`echo -en '\e[37m'`
-	DEFAULT=`echo -en '\e[39m'`
 	# There were errors or warnings when building the ROM. Print message and
 	# print a filtered version of the log file.
 	echo '
@@ -27,7 +28,7 @@ if [[ -f blob.log ]]; then
 	  | sed -r "s/^(\*.*\*)$/${RED}\1${DEFAULT}/g;
 		        s/> > >([A-Za-z0-9_ '\"]+\.asm)\(([0-9]+)\)(.*):/${GREEN}>>>${MAGENTA}\1${CYAN}:${GREEN}\2${CYAN}\3:${DEFAULT}/g;
 		        :repeat;
-		            s/\x1B\[36m\s+([A-Za-z0-9_ '\"]+)\(([0-9]+)\)(.*):\x1B\[39m/${CYAN}:${MAGENTA}\1${CYAN}:${GREEN}\2${CYAN}\3:${DEFAULT}/g;
+		            s/\x1B\[2;36m\s+([A-Za-z0-9_ '\"]+)\(([0-9]+)\)(.*):\x1B\[0;39m/${CYAN}:${MAGENTA}\1${CYAN}:${GREEN}\2${CYAN}\3:${DEFAULT}/g;
 		        t repeat;
 		        s/> > >/${GREEN}>>>${DEFAULT}/g;
 		        s/\berrors?\b:/${RED}Error${CYAN}:${DEFAULT}/gI;
