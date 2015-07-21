@@ -193,6 +193,7 @@ InitTerminal:
 	stopZ80
 
 	lea	(VDP_control_port).l,a3
+	tst.w	(a3)						; Reset "write-pending" flag
 	move.w	#$8004,(a3)					; H-INT disabled
 	move.w	#$8114,(a3)					; Genesis mode, DMA enabled, VBLANK-INT disabled, blanking mode on.
 	move.w	#$8230,(a3)					; PNT A base: $C000
