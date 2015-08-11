@@ -16,13 +16,13 @@
 ; ===========================================================================
 ; ===========================================================================
 ; Make sure these point to the correct locations.
-;----------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 ; Kosinski compressed art (60 tiles)
 ; Terminal font; contains all ASCII characters. For the full list of characters,
 ; see https://en.wikipedia.org/wiki/ASCII#ASCII_printable_characters
 ArtKos_TerminalFont:	BINCLUDE	"TerminalFont.bin"
 	even
-;----------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 ; Palette
 ; The terminal palette
 TerminalPalette:		BINCLUDE	"TerminalPal.bin"
@@ -175,7 +175,7 @@ vtchkp macro dst
 fillr macro src,cnt
 .fill_loop:
 	vtput.w	src
-	dbf	cnt,.fill_loop
+	dbra	cnt,.fill_loop
 	endm
 ; ===========================================================================
 ; Clears the entire terminal.
@@ -255,9 +255,9 @@ DrawTerminal:
 
 .col_loop:
 	move.w	(a1)+,(a3)
-	dbf	d3,.col_loop
+	dbra	d3,.col_loop
 	add.l	d4,d0						; increase destination address by 1 line
-	dbf	d2,.row_loop
+	dbra	d2,.row_loop
 
 	; Exit blanking mode.
 	move.w	#$8154,(a2)					; Genesis mode, DMA enabled, VBLANK-INT disabled, blanking mode off.

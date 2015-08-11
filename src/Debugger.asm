@@ -38,7 +38,7 @@ disableInts macro
     endif
 ; ===========================================================================
 ; Make sure this points to the correct location.
-;----------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 ; Enigma compressed mappings
 MapEng_Debugger:	BINCLUDE	"DebuggerMap.bin"
 	even
@@ -227,9 +227,9 @@ CommonErrorInit:
 	move.l	(a0)+,d0
 	bsr.w	Print_Long
 	seekp.w	4							; Advance to next column
-	dbf	d4,.reg_col_loop
+	dbra	d4,.reg_col_loop
 	seekp.w	nCols,a2					; Advance to next line
-	dbf	d3,.reg_row_loop
+	dbra	d3,.reg_row_loop
 
 	rts
 ; ===========================================================================
@@ -282,7 +282,7 @@ BusAddressError_Handler:
 
 .print_hl:
 	vtput.w	d1
-	dbf	d2,.fc_code_loop
+	dbra	d2,.fc_code_loop
 
 	setcursor	11, 12
 	lea		ErrorDataMsg(pc),a1
@@ -478,9 +478,9 @@ FinishErrorDump:
 	move.l	(a0)+,d0
 	bsr.w	HexDump_Long
 	seekp.w	1							; Advance to next column
-	dbf	d4,.stack_col_loop
+	dbra	d4,.stack_col_loop
 	seekp.w	nCols,a2					; Advance to next line
-	dbf	d3,.stack_row_loop
+	dbra	d3,.stack_row_loop
 
 StackDump_Done:
 	; If we have a last word (as opposed to last long), we need to delete the
@@ -761,7 +761,7 @@ jmp_PC_Disp_Indirect:
 	lea	(a2),a3							; Store found location to a2
 	pea	SetFullRecovery(pc)				; Replace "new" return with this
 	bra.w	PC_Disp_Indirect
-;---------------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 .found_many:
 	addq.w	#4,sp
 	pea	SetInferredRecovery(pc)			; Replace "new" return with this
@@ -986,11 +986,11 @@ WordBranch_ScanSource:
 	blt.s	.keep_searching				; Branch if not
 	addq.w	#1,d2						; Flag as so...
 	bra.s	.search_done				; ... and stop the search
-;---------------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 .keep_searching:
 	pea	(a0)							; Store found location in stack
 	bra.s	.chknext					; And go to the next iteration
-;---------------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 .found_first:
 	lea	2(a0),a2						; Store found location to a2
 
@@ -1015,7 +1015,7 @@ WordBranch_ScanSource:
 
 .done:
 	rts									; Preserves condition codes
-;---------------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 .found_many:
 	tellp.l	a1							; Save output pointer
 	setcursor	1, 11
