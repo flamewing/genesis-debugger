@@ -38,14 +38,14 @@ TerminalBuffer                   = ramaddr($FFFF0000)
 ; ===========================================================================
 ; NO USER SERVICEABLE PARTS BELOW THIS POINT
 ; ===========================================================================
-WHITE := palette_line_0
-BLUE  := palette_line_1
-RED   := palette_line_2
-GREEN := palette_line_3
+WHITE = palette_line_0
+BLUE  = palette_line_1
+RED   = palette_line_2
+GREEN = palette_line_3
 ; ===========================================================================
 ; Function to aid in moving the cursor to a given location.
-nCols := 40
-nRows := 28
+nCols = 40
+nRows = 28
 DisplayCell function col,line,((2 * nCols * line) + (2 * col))
 ; ===========================================================================
 ; Macro for defining strings suitable for efficient use with the functions in

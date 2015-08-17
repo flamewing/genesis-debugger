@@ -27,7 +27,7 @@ Revision = 1
 ; ===========================================================================
 ; Convenience macros, for increased maintainability of the code.
     ifndef intMacros_defined
-intMacros_defined := 1
+intMacros_defined = 1
 enableInts macro
 	move	#$2300,sr
     endm
@@ -53,13 +53,13 @@ EMailmsg:	vtstring BLUE ,"your.email@server.domain         "
 ; ===========================================================================
 ; All 16 registers are saved on stack, so we need to skip 16*4 bytes to reach
 ; the exception data.
-except_off := 16*4
+except_off = 16*4
 ; Size of stack frame of group 0 exceptions except for reset.
-group0_sz  := 14
+group0_sz  = 14
 ; Offset for saved SR in group 0 stack frame.
-group0_sr  := 8
+group0_sr  = 8
 ; Size of stack frame for group 1 and 2 exceptions.
-group12_sz := 6
+group12_sz = 6
 ; ===========================================================================
 ; System strings, do not edit.
 BusErrorMsg:			vtstring BLUE ,"   A bus error has occurred  "
