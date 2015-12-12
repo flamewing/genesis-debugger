@@ -239,12 +239,14 @@ InitTerminal:
 	vtcls								; Clear screen
 	rts
 ; ===========================================================================
+planeLocH40_ function col,line,(($80 * line) + (2 * col))
+; ---------------------------------------------------------------------------
 DrawTerminal:
-	; Inlined the call to PlaneMapToVRAM for one less external dependency.
+	; Inlined the call to PlaneMapToVRAM_H40 for one less external dependency.
 	lea	(TerminalBuffer).l,a1
 	lea	(VDP_data_port).l,a3
 	lea	(VDP_control_port).l,a2
-	move.l	#vdpCommDelta($0080),d4
+	move.l	#vdpCommDelta(planeLocH40_(0,1)),d4
 	move.l	#vdpComm(VRAM_Plane_A_Name_Table,VRAM,WRITE),d0
 	moveq	#nCols-1,d1					; Width
 	moveq	#nRows-1,d2					; Height

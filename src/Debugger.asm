@@ -437,7 +437,7 @@ FinishErrorDump:
 	bpl.s	NoStackTrace				; Branch if positive or zero (stack underflow or empty)
 	neg.w	d3
 	cmpi.w	#$50,d3						; Limit to $50 bytes, as this is all space we have.
-	bcs.s	.have_byte_count
+	blo.s	.have_byte_count
 	moveq	#$50,d3
 
 .have_byte_count:
@@ -944,7 +944,7 @@ SetLostData:
 ; 	If the overflow flag is set, several matches were found in the search area.
 ; 	If neither is set, a single match was found.
 WordBranch_ScanSource:
-	movea.l	a3,d0						; Copy destination address
+	move.l	a3,d0						; Copy destination address
 	bclr	#0,d0						; Strip off lowest bit so ge have a valid address...
 	st.b	d2							; ... but make sure we know if it was 1
 	move.l	#-$8000,d1					; Offset back for the search

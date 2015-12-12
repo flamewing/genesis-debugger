@@ -640,7 +640,7 @@ Handle_MoveM_Reg_List:
 	; Loop until a register is specified.
 .find_reg_loop:
 	jsr	(a4)
-	dbcs.w	d3,.find_reg_loop
+	dblo.w	d3,.find_reg_loop
 	; Save the register.
 	move.w	d3,d2
 	bmi.s	.done						; We finished the loop, so exit.
@@ -648,7 +648,7 @@ Handle_MoveM_Reg_List:
 	; Loop through all contiguous registers.
 .find_last_reg:
 	jsr	(a4)
-	dbcc.w	d3,.find_last_reg
+	dbhs.w	d3,.find_last_reg
 
 	; Add back last bit shifted out.
 	jsr	Normal_Put_Back-Normal_Next_Reg(a4)
