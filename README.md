@@ -1,3 +1,11 @@
+## License
+This uses a bsd 0-Clause License (0BSD). The TL;DR version is [here](https://tldrlegal.com/license/bsd-0-clause-license).
+
+Basically, you can use however you want, and you don't have to add credits, licenses, or anything to your hack.
+
+I only ask for the courtesy of giving some credit if you use it, but you are not forced to do it.
+
+## About
 This is a general error debugging screen for the Sega Genesis witht he following features:
 
 - integrated disassembler, which is logically separated from the drawing code and from the debugger screen;
@@ -147,3 +155,4 @@ DisassemblyTest:
         bra.s   .error_trap
 ; ===========================================================================
 ```
+
