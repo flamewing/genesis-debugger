@@ -16,7 +16,9 @@
 EnableDebugger = 1						; 1 = enabled, 0 = disabled
 ; ===========================================================================
 ; Use this to identify the revision of your hack:
+  ifndef Revision
 Revision = 1
+  endif
 ; ===========================================================================
 ; This should be the path to "Disassembler.asm":
   if EnableDebugger
