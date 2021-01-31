@@ -12,6 +12,7 @@
 ; ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 ; OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ; ===========================================================================
+	include "vdp-macros.asm"
 ; Make sure these point to the correct locations.
 ; ---------------------------------------------------------------------------
 ; Kosinski compressed art (60 tiles)
@@ -32,6 +33,16 @@ TerminalFont_Len                 = tiles_to_bytes($60)
 ; ===========================================================================
 ; Location in RAM. Just use this default.
 TerminalBuffer                   = ramaddr($FFFF0000)
+; ===========================================================================
+; Locations in VRAM. Just use this default.
+VRAM_Terminal_Window_Name_Table                   = $F000					; Extends until $FFFF
+VRAM_Terminal_Plane_A_Name_Table                  = $C000					; Extends until $CFFF
+VRAM_Terminal_Plane_B_Name_Table                  = $E000					; Extends until $EFFF
+VRAM_Terminal_Plane_Table_Size                    = planeSizeBytes(64,32)	; 64 cells x 32 cells x 2 bytes per cell
+VRAM_Terminal_Sprite_Attribute_Table              = $F800					; Extends until $FA7F
+VRAM_Terminal_Sprite_Attribute_Table_Size         = $0280					; 640 bytes
+VRAM_Terminal_Horiz_Scroll_Table                  = $DC00					; Extends until $DF7F
+VRAM_Terminal_Horiz_Scroll_Table_Size             = $0380					; 224 lines * 2 bytes per entry * 2 PNTs
 ; ===========================================================================
 ; NO USER SERVICEABLE PARTS BELOW THIS POINT
 ; ===========================================================================
@@ -191,25 +202,25 @@ InitTerminal:
 
 	lea	(VDP_control_port).l,a3
 	tst.w	(a3)						; Reset "write-pending" flag
-	move.w	#$8004,(a3)					; H-INT disabled
-	move.w	#$8114,(a3)					; Genesis mode, DMA enabled, VBLANK-INT disabled, blanking mode on.
-	move.w	#$8230,(a3)					; PNT A base: $C000
-	move.w	#$833C,(a3)					; Window Address: $F000
-	move.w	#$8407,(a3)					; PNT B base: $E000
-	move.w	#$857C,(a3)					; Sprite attribute table base: $F800
-	move.w	#$8600,(a3)					; Sprite Pattern Generator Base Address: low 64KB VRAM
-	move.w	#$8700,(a3)					; Background palette/color: 0/0
-	move.w	#$8800,(a3)					; Null
-	move.w	#$8900,(a3)					; Null
-	move.w	#$8AFF,(a3)					; H-INT every $FF scanlines
-	move.w	#$8B00,(a3)					; EXT-INT disabled, V scroll by screen, H scroll by screen
-	move.w	#$8C81,(a3)					; H res 40 cells, no interlace
-	move.w	#$8D37,(a3)					; HScroll Table Address: $DC00
-	move.w	#$8E00,(a3)					; Nametable Pattern Generator Base Address: low 64KB VRAM
-	move.w	#$8F02,(a3)					; VDP auto increment 2 bytes
-	move.w	#$9001,(a3)					; Scroll table size: 64x32
-	move.w	#$9100,(a3)					; Window H left side, Base Point 0
-	move.w	#$9200,(a3)					; Window V upside, Base Point 0
+	move.w	#regMode1(HINT_OFF|HVLATCH_OFF),(a3)							; H-INT disabled, Enable HV counter read
+	move.w	#regMode2(DISPLAY_OFF|VINT_OFF|DMA_ON|V30_OFF|MODE_GEN),(a3)	; Display disabled, Genesis mode, DMA enabled, V-INT disabled, V res 28 cells.
+	move.w	#regPlaneA(VRAM_Terminal_Plane_A_Name_Table),(a3)				; PNT A base: $C000
+	move.w	#regWindow(VRAM_Terminal_Window_Name_Table),(a3)				; Window Address: $F000
+	move.w	#regPlaneB(VRAM_Terminal_Plane_B_Name_Table),(a3)				; PNT B base: $E000
+	move.w	#regSprite(VRAM_Terminal_Sprite_Attribute_Table),(a3)			; Sprite attribute table base: $F800
+	move.w	#regBaseSprite(SPRITES_LOW),(a3)								; Sprite Pattern Generator Base Address: low 64KB VRAM
+	move.w	#regBGColor(0,0),(a3)											; Background palette/color: 0/0
+	move.w	#regMode4HScroll(0),(a3)										; Mode 4 H-Scroll: 0
+	move.w	#regMode4VScroll(0),(a3)										; Mode 4 V-Scroll: 0
+	move.w	#regHIntLine($FF),(a3)											; H-INT every $FF scanlines
+	move.w	#regMode3(EXINT_OFF|VSCROLL_FULL|HSCROLL_FULL),(a3)				; EXT-INT off, V scroll by screen, H scroll by screen
+	move.w	#regMode4(MODE_H40|SHADOWHILITE_OFF|INTERLACE_OFF),(a3)			; H res 40 cells, no interlace, S/H disabled
+	move.w	#regScroll(VRAM_Terminal_Horiz_Scroll_Table),(a3)				; HScroll Table Address: $DC00
+	move.w	#regBasePlane(PLANE_B_LOW|PLANE_A_LOW),(a3)						; Nametable Pattern Generator Base Address on low 64KB VRAM
+	move.w	#regAutoIncr(2),(a3)											; VRAM pointer increment: $0002
+	move.w	#regPlaneSize(64,32),(a3)										; Scroll table size: 64x32
+	move.w	#regWindowHLoc(DOCK_LEFT,0),(a3)								; Window H left side, Base Point 0
+	move.w	#regWindowVLoc(DOCK_TOP,0),(a3)									; Window V upside, Base Point 0
 
 	; Copy the palette to CRAM
 	dma68kToVDP TerminalPalette,$0000,TerminalPalette_Len,CRAM
@@ -244,7 +255,7 @@ DrawTerminal:
 	lea	(VDP_data_port).l,a3
 	lea	(VDP_control_port).l,a2
 	move.l	#vdpCommDelta(planeLocH40_(0,1)),d4
-	move.l	#vdpComm(VRAM_Plane_A_Name_Table,VRAM,WRITE),d0
+	move.l	#vdpComm(VRAM_Terminal_Plane_A_Name_Table,VRAM,WRITE),d0
 	moveq	#nCols-1,d1					; Width
 	moveq	#nRows-1,d2					; Height
 
@@ -259,7 +270,7 @@ DrawTerminal:
 	dbra	d2,.row_loop
 
 	; Exit blanking mode.
-	move.w	#$8154,(a2)					; Genesis mode, DMA enabled, VBLANK-INT disabled, blanking mode off.
+	move.w	#regMode2(DISPLAY_ON|VINT_OFF|DMA_ON|V30_OFF|MODE_GEN),(a2)		; Display enabled, Genesis mode, DMA enabled, V-INT disabled, V res 28 cells.
 	rts
 ; ===========================================================================
 ; SUBROUTINE

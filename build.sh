@@ -14,7 +14,16 @@ DEFAULT=`echo -en '\e[0;39m'`
 rm -rf blob/*.bin *.7z *.bin *.h *.lst *.p
 
 # First of all, we assemble the binary
-asl -xx -c -E -q -L -r 2 -A -U -i src blob.asm
+if [[ "$OS" -eq "Windows_NT" ]]; then
+	AS=./asw.exe
+	P2BIN=./p2bin.exe
+	EXEEXT=.exe
+else
+	AS=asl
+	P2BIN=p2bin
+	EXEEXT=
+fi
+$AS -xx -c -E -q -L -r 2 -A -U -i src blob.asm
 
 if [[ -f blob.log ]]; then
 	# There were errors or warnings when building the ROM. Print message and
@@ -37,7 +46,7 @@ if [[ -f blob.log ]]; then
 	exit 1
 fi
 
-p2bin blob.p &> /dev/null
+$P2BIN blob.p &> /dev/null
 
 # There are 12 bytes in jmp instructions at the start that we need to skip
 JumpSkip=12

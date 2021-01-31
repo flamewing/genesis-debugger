@@ -57,7 +57,7 @@ dma68kToVDP macro source,dest,length,type
 	move.l	#(($9400|((((length)>>1)&$FF00)>>8))<<16)|($9300|(((length)>>1)&$FF)),(a5)
 	if source>=0
 	lea	source(pc),a1
-	movea.l	a1,d1
+	move.l	a1,d1
 	move.w	#$9500,d0						; command to specify source address & $0001FE
 	lsr.l	#1,d1
 	move.b	d1,d0
@@ -130,7 +130,6 @@ Z80_Bus_Request =			$A11100
 Z80_Reset =					$A11200
 
 ; VRAM constants
-VRAM_Plane_A_Name_Table               = $C000	; Extends until $CFFF
 ArtTile_VRAM_Start                    = $0000
 
 ; simplifying macros and functions

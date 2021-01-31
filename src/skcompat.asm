@@ -28,9 +28,7 @@ Chunk_Table EQU Chunk_table
 System_Stack EQU System_stack
 
 ; VRAM constants
-VRAM_Plane_A_Name_Table               = $C000	; Extends until $CFFF
-ArtTile_VRAM_Start                    = $0000
-
+ArtTile_VRAM_Start                       = $0000
 
 ; simplifying macros and functions
 
