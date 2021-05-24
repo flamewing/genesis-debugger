@@ -827,8 +827,8 @@ Check_CC:
 ; 	Zero flag set if this is a valid divs or divl, clear otherwise.
 ChkDiv:
 	move.w	d5,d0
-	and.w	#$F0C0,d0					; Get the mask bits
-	cmp.w	#$80C0,d0					; Is this equal to the bits for the instruction?
+	andi.w	#$F0C0,d0					; Get the mask bits
+	cmpi.w	#$80C0,d0					; Is this equal to the bits for the instruction?
 	bne.s	.done						; Branch if not
 	moveq	#1,d3						; Word-sized
 	move.w	d5,d1
@@ -846,8 +846,8 @@ ChkDiv:
 ; 	Zero flag set if this is a valid chk, clear otherwise.
 ChkChk:
 	move.w	d5,d0
-	and.w	#$F040,d0					; Get the mask bits
-	cmp.w	#$4000,d0					; Is this equal to the bits for the instruction?
+	andi.w	#$F040,d0					; Get the mask bits
+	cmpi.w	#$4000,d0					; Is this equal to the bits for the instruction?
 	bne.s	.done						; Branch if not
 	moveq	#1,d3						; Word-sized
 	move.w	d5,d1
@@ -865,8 +865,8 @@ ChkChk:
 ; 	Zero flag set if this is a valid trapv, clear otherwise.
 ChkTrapV:
 	move.w	d5,d0
-	and.w	#$4E76,d0					; Get the mask bits
-	cmp.w	#$4E76,d0					; Is this equal to the bits for the instruction?
+	andi.w	#$4E76,d0					; Get the mask bits
+	cmpi.w	#$4E76,d0					; Is this equal to the bits for the instruction?
 	rts
 ; ===========================================================================
 ; SUBROUTINE
@@ -877,8 +877,8 @@ ChkTrapV:
 ; 	Zero flag set if this is a valid trap, clear otherwise.
 ChkTrap:
 	move.w	d5,d0
-	and.w	#$FFF0,d0					; Get the mask bits
-	cmp.w	#$4E40,d0					; Is this equal to the bits for the instruction?
+	andi.w	#$FFF0,d0					; Get the mask bits
+	cmpi.w	#$4E40,d0					; Is this equal to the bits for the instruction?
 	rts
 ; ===========================================================================
 ; Computes size of affective address data
