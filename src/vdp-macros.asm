@@ -145,4 +145,33 @@ regDMASrcHigh function type,length,$9700|valDMASrcHigh(type,length)
 
 planeSizeBytes function width,height,((height-32)/32)*((width-32)/32)*2
 
+; Status register bits
+IS_PAL_BIT      = 0
+DMA_ACTIVE_BIT  = 1
+HBLANK_BIT      = 2
+VBLANK_BIT      = 3
+
+IS_PAL_MASK     = 1<<IS_PAL_BIT
+DMA_ACTIVE_MASK = 1<<DMA_ACTIVE_BIT
+HBLANK_MASK     = 1<<HBLANK_BIT
+VBLANK_MASK     = 1<<VBLANK_BIT
+
+; Tells the VDP to copy from a region of VRAM to another.
+dmaCopyVRAM macro src,dest,length
+	if MOMPASS>1
+		if (length)==0
+			fatal "DMA is copying 0 bytes (becomes a 64kB copy). If you really mean it, pass 64kB (65536) instead."
+		endif
+	endif
+	lea	(VDP_control_port).l,a5
+	move.l	#dmaCommLength(2*length),(a5)
+	move.l	#dmaCommSrcLow(src),(a5)
+	move.l	#makeLong(regAutoIncr(1),regDMASrcHigh(COPY_FLAG,0)),(a5) ; VRAM pointer increment: $0001, VRAM copy
+	move.l	#vdpComm(addr,VRAM,DMA),(a5)
+.loop:
+	moveq	#DMA_ACTIVE_MASK,d1
+	and.w	(a5),d1
+	bne.s	.loop ; busy loop until the VDP is finished filling...
+	move.w	#regAutoIncr(2),(a5) ; VRAM pointer increment: $0002
+	endm
     endif

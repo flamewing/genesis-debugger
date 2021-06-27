@@ -622,7 +622,7 @@ Predecr_Next_Reg:
 	rts
 ; ---------------------------------------------------------------------------
 	if *-Predecr_Next_Reg > Normal_Put_Back-Normal_Next_Reg
-	fatal "The code in Predecr_Next_Reg must not be larger than the code in Normal_Next_Reg"
+		fatal "The code in Predecr_Next_Reg must not be larger than the code in Normal_Next_Reg"
 	endif
 	org Predecr_Next_Reg+Normal_Put_Back-Normal_Next_Reg
 Predecr_Put_Back:

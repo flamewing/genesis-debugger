@@ -16,25 +16,25 @@
 EnableDebugger = 1						; 1 = enabled, 0 = disabled
 ; ===========================================================================
 ; Use this to identify the revision of your hack:
-  ifndef Revision
-Revision = 1
-  endif
+	ifndef Revision
+		equ Revision,1
+	endif
 ; ===========================================================================
 ; This should be the path to "Disassembler.asm":
   if EnableDebugger
 	include "Disassembler.asm"
 ; ===========================================================================
 ; Convenience macros, for increased maintainability of the code.
-    ifndef intMacros_defined
+	ifndef intMacros_defined
 intMacros_defined = 1
 enableInts macro
 	move	#$2300,sr
-    endm
+	endm
 
 disableInts macro
 	move	#$2700,sr
-    endm
-    endif
+	endm
+	endif
 ; ===========================================================================
 ; Make sure this points to the correct location.
 ; ---------------------------------------------------------------------------
@@ -97,10 +97,10 @@ InitErrorHandler macro framesz,errmsg,rewindflag,rewindfun
 	lea	errmsg(pc),a1
 	bsr.w	CommonErrorInit
 	if "rewindflag"<>""
-	moveq	#rewindflag,d1
+		moveq	#rewindflag,d1
 	endif
 	if "rewindfun"<>""
-	lea	rewindfun(pc),a4
+		lea	rewindfun(pc),a4
 	endif
 	move.l	sp,usp						; Save current stack pointer to usp
 	endm

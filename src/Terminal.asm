@@ -24,7 +24,7 @@ ArtKos_TerminalFont:	BINCLUDE	"TerminalFont.bin"
 ; Palette
 ; The terminal palette
 TerminalPalette:		BINCLUDE	"TerminalPal.bin"
-TerminalPalette_Len := *-TerminalPalette
+TerminalPalette_Len = *-TerminalPalette
 	even
 ; ===========================================================================
 ; Location of art in VRAM. Just use these defaults.
@@ -60,42 +60,40 @@ DisplayCell function col,line,((2 * nCols * line) + (2 * col))
 ; this module. Adds a length prefix and maps characters to have the correct
 ; colors, as needed.
 vtstring macro pal,letters
-c := 0
 	dc.w	strlen(letters)
-	rept strlen(letters)
-t := substr(letters,c,1)
-	; Note: ? is not on the list
-	if strstr("*@[\\]()+,-./:;#$%&! ",t)>=0
-	dc.w	t							; raw character (no palette modifier)
-	else
-	dc.b	pal>>8,t					; output letter code
-	endif
-c := c+1
+	irpc char,letters
+		; Note: ? is not on the list
+		if strstr("*@[\\]()+,-./:;#$%&! ","char")>=0
+			dc.w	"char"					; raw character (no palette modifier)
+		else
+			dc.b	pal>>8,"char"			; output letter code
+		endif
 	endm
 	endm
 ; ===========================================================================
 ; Macro that puts a character in the buffer with the given color, if any.
 ; In general, punctuation characters are uncolored by default.
 vtputc macro char,clr
-.r := charfromstr(char,0)
+	set	.r,charfromstr(char,0)
 	; Note: ? is not on the list
 	if strstr("*@[\\]()+,-./:;#$%&! ",char)>=0
-	move.w	#.r,(a5)+					; raw character (no palette modifier)
+		move.w	#.r,(a5)+					; raw character (no palette modifier)
 	elseif "clr"<>""
-	move.w	#clr|.r,(a5)+				; output letter code
+		move.w	#clr|.r,(a5)+				; output letter code
 	else
-	move.w	#.r,(a5)+					; output letter code
+		move.w	#.r,(a5)+					; output letter code
 	endif
 	endm
 ; ===========================================================================
 ; Macro that puts a string of characters in the buffer with the given color, if
 ; any. Uses vtputc internally.
 vtputs macro letters,clr
-.c := 0
-	rept strlen(letters)
-.t := substr(letters,.c,1)
-	vtputc	.t,clr
-.c := .c+1
+	irpc char,letters
+		if "char\t"=="\\t"
+			vtputc	"\\",clr
+		else
+			vtputc	"char",clr
+		endif
 	endm
 	endm
 ; ===========================================================================
@@ -147,9 +145,9 @@ tellp macro dst
 ; Moves the put pointer by the given distance.
 seekp macro off,dst
 	if "dst"<>""
-	add.ATTRIBUTE	#DisplayCell(off,0),dst
+		add.ATTRIBUTE	#DisplayCell(off,0),dst
 	else
-	adda.ATTRIBUTE	#DisplayCell(off,0),a5
+		adda.ATTRIBUTE	#DisplayCell(off,0),a5
 	endif
 	endm
 ; ===========================================================================
@@ -161,9 +159,9 @@ seekset macro src
 ; Sets the put pointer to the given column and row.
 setcursor	macro col,row,dst
 	if "dst"<>""
-	lea	(TerminalBuffer + DisplayCell(col,row)).l,dst
+		lea	(TerminalBuffer + DisplayCell(col,row)).l,dst
 	else
-	lea	(TerminalBuffer + DisplayCell(col,row)).l,a5
+		lea	(TerminalBuffer + DisplayCell(col,row)).l,a5
 	endif
 	endm
 ; ===========================================================================
@@ -238,9 +236,9 @@ InitTerminal:
 	lea	ArtKos_TerminalFont(pc),a0
 	lea	(Chunk_Table).l,a1
 	ifdef debugger_blob
-	jsr	KosDec(pc)
+		jsr	KosDec(pc)
 	else
-	jsr	(KosDec).w
+		jsr	(KosDec).w
 	endif
 	dma68kToVDP TerminalBuffer,tiles_to_bytes(ArtTile_ArtKos_TerminalFont),TerminalFont_Len,VRAM
 
@@ -293,13 +291,14 @@ Print_Message:
 ; specified attribute.
 HexDump	macro
 	; Select number of nibbles to print based on attribute given.
-	if "ATTRIBUTE"=="b"
-	moveq	#1,d2
-	elseif "ATTRIBUTE"=="w"
-	moveq	#3,d2
-	elseif "ATTRIBUTE"=="l"
-	moveq	#7,d2
-	endif
+	switch "ATTRIBUTE"
+		case "b"
+			moveq	#1,d2
+		case "w"
+			moveq	#3,d2
+		case "l"
+			moveq	#7,d2
+	endcase
 	move.w	d1,-(sp)
 
 .put_digit_loop:
