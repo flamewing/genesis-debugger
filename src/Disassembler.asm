@@ -248,9 +248,10 @@ Handle_Immed_to_CCR_SR:
 	lea	SizeMsgs(pc),a1
 	adda.w	(a1,d3.w),a1
 	bsr.w	Print_Message
-	eori.w	#2,d3						; This is here because table is reused.
+	moveq	#2,d1
+	eor.w	d3,d1						; This is here because table is reused.
 	lea	Immed_to_CCR_SR_Msgs(pc),a1
-	adda.w	(a1,d3.w),a1
+	adda.w	(a1,d1.w),a1
 	lsr.w	#1,d3
 	move.w	d5,d1						; Effective address bits
 	moveq	#2,d4						; Immediate is an additional parameter
@@ -1084,6 +1085,9 @@ GTmsg:	vtstring BLUE,"gt"
 LEmsg:	vtstring BLUE,"le"
 ; ===========================================================================
 Dis_MoveQ:								; %0111
+	; Maybe moveq.
+	btst	#8,d5
+	bne.w	IllegalInstruction			; Branch if bit 8 is set.
 	; moveq.
 	lea	Moveqmsg(pc),a1
 	bsr.w	Print_Message
